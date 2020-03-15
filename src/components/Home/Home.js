@@ -4,7 +4,8 @@ import {
   API_KEY,
   IMAGE_BASE_URL,
   POSTER_SIZE,
-  BACKGROUND_SIZE
+  BACKGROUND_SIZE,
+  BACKDROP_SIZE
 } from "../../config";
 import HeroImage from "../elements/HeroImage/HeroImage";
 import SearchBar from "../elements/SearchBar/SearchBar";
@@ -28,6 +29,22 @@ class Home extends Component {
     this.setState({ loading: true });
     const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
     this.fetchitems(endpoint);
+  }
+
+  searchItems = (searchTerm) => {
+      let endpoint = ''
+      this.setState({
+          movies: [],
+          loading: true,
+          searchTerm,
+      })
+
+      if (searchTerm === ''){
+          endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+      } else {
+          endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${searchTerm}`;
+      }
+      this.fetchitems(endpoint);
   }
 
   loadMoreItems = () => {
@@ -56,15 +73,24 @@ class Home extends Component {
           loadimg: false,
           currentPage: result.page,
           totalPages: result.total_pages
-        });
-      });
+        })
+      })
+      .catch(error => console.error('error:', error))
   };
 
   render() {
     return (
       <div className="rmdb-home">
-        <HeroImage />
-        <SearchBar />
+        {/* using turnary operator */}
+        {this.state.heroImage ? 
+        <div>
+          <HeroImage 
+            image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}/${this.state.heroImage.backdrop_path}`}
+            title={this.state.heroImage.original_title}
+            text={this.state.heroImage.overview}
+          />
+          <SearchBar />
+        </div> : null }
         <FourColGrid />
         <Spinner />
         <LoadMoreBtn />

@@ -1,18 +1,4 @@
-Skip to content
-Search or jump to…
 
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@Eyakub 
-Code Issues 0 Pull requests 0 Projects 0 Actions Wiki Security Pulse Community
-React-RMDB/src/components/elements/HeroImage/HeroImage.css
-@weibenfalk weibenfalk one more try
-321e45a on Mar 21, 2019
-64 lines (56 sloc)  1.01 KB
- 
 .rmdb-heroimage {
   background-size: 100%, cover !important;
   background-position: center, center !important;
