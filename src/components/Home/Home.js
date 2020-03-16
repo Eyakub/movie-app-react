@@ -57,7 +57,7 @@ class Home extends Component {
       endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=${this
         .state.currentPage + 1}`;
     } else {
-      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query${
+      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${
         this.state.searchTerm
       }&page=${this.state.currentPage + 1}`;
     }
@@ -71,7 +71,7 @@ class Home extends Component {
         this.setState({
           movies: [...this.state.movies, ...result.results],
           heroImage: this.state.heroImage || result.results[0],
-          loadimg: false,
+          loading: false,
           currentPage: result.page,
           totalPages: result.total_pages
         });
