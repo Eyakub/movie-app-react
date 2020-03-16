@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import FontAwesome from 'react-fontawesome';
+// import FontAwesome from 'react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './SearchBar.css';
 
 class SearchBar extends Component{
@@ -23,7 +25,7 @@ class SearchBar extends Component{
     return (
       <div className="rmdb-searchbar">
         <div className="rmdb-searchbar-content">
-          <FontAwesome className="rmdb-fa-search" name="search" size="2x" />
+          <FontAwesomeIcon icon="rmdb-fa-search" name="search" size="2x" />
           <input type="text"
             className="rmdb-searchbar-input"
             placeholder="Search"
