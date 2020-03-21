@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 // import FontAwesome from 'react-fontawesome';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+// import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import './SearchBar.css';
 
 class SearchBar extends Component{

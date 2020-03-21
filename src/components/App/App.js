@@ -2,7 +2,7 @@ import React from "react";
 import Header from "../elements/Header/Header";
 import Home from "../Home/Home";
 import NotFound from '../elements/NotFound/NotFound';
-import Movie from '../elements/Movie/Movie';
+import Movie from '../Movie/Movie';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 const App = () => {
