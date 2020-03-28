@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './FourColGrid.css';
 
 const FourColGrid = (props) => {
@@ -23,6 +24,12 @@ const FourColGrid = (props) => {
       </div>
     </div>
   )
+}
+
+// proptypes helps us to find bugs on passing variable
+FourColGrid.propTypes = {
+  header: PropTypes.string,
+  loading: PropTypes.bool,
 }
 
 export default FourColGrid
