@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="react_rmdb">
         <React.Fragment>
             <Header></Header>
             <Switch>
