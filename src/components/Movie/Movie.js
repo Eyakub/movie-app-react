@@ -37,7 +37,7 @@ class Movie extends Component {
         this.setState({ loading: false });
       } else {
         this.setState({ movie: result })
-        const creditsEndpoint = `${API_URL}movie/${this.props.match.params.movieId}/credits?api_key=${API_KEY}`;
+        const creditsEndpoint = `${API_URL}movie/${movieId}/credits?api_key=${API_KEY}`;
         const creditsResult = await(await fetch(creditsEndpoint)).json();
         const directors = creditsResult.crew.filter(
           member => member.job === "Director"
@@ -51,6 +51,7 @@ class Movie extends Component {
           localStorage.setItem(`${this.props.match.params.movieId}`, JSON.stringify(this.state));
         });
       }
+
 
     }
     catch (e){

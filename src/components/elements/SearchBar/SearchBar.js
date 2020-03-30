@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 // import FontAwesome from 'react-fontawesome';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -6,20 +7,34 @@ import './SearchBar.css';
 
 class SearchBar extends Component{
   state = {
-
+    value: '',
   }
 
   timeout = null;
 
   doSearch = (event) => {
-    this.setState({ value: event.target.value });
-    // clear timeout everytime we search
+    // ES6 destructuring props and state
+    const { callback } = this.props;
+    // const { value }  = this.state;
+
+    this.setState({ value: event.target.value })
     clearTimeout(this.timeout);
 
-    this.timeout = setTimeout(() => {
-      this.props.callback(this.state.value)
+    // set a timeout to wait for the user to stop writing
+    // so we don't have to make unnecessary calls
+    this.timeout = setTimeout( () => {
+      callback(false, this.state.value);
     }, 500);
   }
+  // doSearch = (event) => {
+  //   this.setState({ value: event.target.value });
+  //   // clear timeout everytime we search
+  //   clearTimeout(this.timeout);
+
+  //   this.timeout = setTimeout(() => {
+  //     this.props.callback(this.state.value)
+  //   }, 500);
+  // }
 
   render(){
     return (
@@ -36,6 +51,10 @@ class SearchBar extends Component{
       </div>
     )
   }
+}
+
+SearchBar.propTypes = {
+  callback: PropTypes.func
 }
 
 export default SearchBar

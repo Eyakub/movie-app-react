@@ -4,7 +4,6 @@ import {
   API_KEY,
   IMAGE_BASE_URL,
   POSTER_SIZE,
-  BACKGROUND_SIZE,
   BACKDROP_SIZE
 } from "../../config";
 import HeroImage from "../elements/HeroImage/HeroImage";
@@ -32,52 +31,72 @@ class Home extends Component {
       this.setState({ ...state });
     } else {
       this.setState({ loading: true });
-      const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
-      this.fetchitems(endpoint);
+      // const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+      this.fetchItems(this.createEndpoint("movie/popular", false, ""));
     }
   }
 
-  searchItems = searchTerm => {
-    console.log(searchTerm);
-    let endpoint = "";
+  createEndpoint = (type, loadMore, searchTerm) => {
+    return `${API_URL}${type}?api_key=${API_KEY}&language=en-US&page=${loadMore &&
+      this.state.currentPage + 1}&query=${searchTerm}`;
+  };
+
+  updateItems = (loadMore, searchTerm) => {
     this.setState({
-      movies: [],
+      movies: loadMore ? [...this.state.movies] : [],
       loading: true,
-      searchTerm
-    });
+      searchTerm: loadMore ? this.state.searchItem : searchTerm,
+    },
+    () => {
+      this.fetchItems(
+        !this.state.searchTerm
+        ? this.createEndpoint("movie/popular", loadMore, "")
+        : this.createEndpoint("search/movie", loadMore, this.state.searchTerm)
+      )
+    })
+  }
 
-    if (searchTerm === "") {
-      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
-    } else {
-      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${searchTerm}`;
-    }
-    this.fetchitems(endpoint);
-  };
+  // searchItems = searchTerm => {
+  //   console.log(searchTerm);
+  //   let endpoint = "";
+  //   this.setState({
+  //     movies: [],
+  //     loading: true,
+  //     searchTerm
+  //   });
 
-  loadMoreItems = () => {
-    let endpoint = "";
-    this.setState({
-      loading: true
-    });
-    if (this.state.searchTerm === "") {
-      endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=${this
-        .state.currentPage + 1}`;
-    } else {
-      endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${
-        this.state.searchTerm
-        }&page=${this.state.currentPage + 1}`;
-    }
-    this.fetchitems(endpoint);
-  };
+  //   if (searchTerm === "") {
+  //     endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+  //   } else {
+  //     endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${searchTerm}`;
+  //   }
+  //   this.fetchitems(endpoint);
+  // };
 
-  fetchitems = async endpoint => {
-    const { movies, heroImage, searchItem } = this.state;
+  // loadMoreItems = () => {
+  //   let endpoint = "";
+  //   this.setState({
+  //     loading: true
+  //   });
+  //   if (this.state.searchTerm === "") {
+  //     endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=${this
+  //       .state.currentPage + 1}`;
+  //   } else {
+  //     endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${
+  //       this.state.searchTerm
+  //     }&page=${this.state.currentPage + 1}`;
+  //   }
+  //   this.fetchitems(endpoint);
+  // };
+
+  fetchItems = async endpoint => {
+    const { movies, heroImage, searchTerm } = this.state;
     const result = await (await fetch(endpoint)).json();
-    try{
+    try {
       this.setState(
         {
-          movies: [...this.state.movies, ...result.results],
-          heroImage: this.state.heroImage || result.results[0],
+          movies: [...movies, ...result.results],
+          heroImage: heroImage || result.results[0],
           loading: false,
           currentPage: result.page,
           totalPages: result.total_pages
@@ -85,14 +104,13 @@ class Home extends Component {
         () => {
           // doing this for setting STATE on local storage
           // check from chrome console > application
-          if (this.state.searchTerm === "") {
+          if (searchTerm === "") {
             // if we don't want to store search result
             localStorage.setItem("HomeState", JSON.stringify(this.state));
           }
         }
       );
-    }
-    catch (e){
+    } catch (e) {
       console.log("There was an error: ", e);
     }
   };
@@ -136,16 +154,16 @@ class Home extends Component {
     return (
       <div className="rmdb-home">
         {/* using turnary operator */}
-        {heroImage ? (
+        {heroImage && !searchTerm ? (
           <div>
             <HeroImage
               image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}/${heroImage.backdrop_path}`}
               title={heroImage.original_title}
               text={heroImage.overview}
             />
-            <SearchBar callback={this.searchItems} />
           </div>
         ) : null}
+        <SearchBar callback={this.updateItems} />
         <div className="rmdb-home-grid">
           <FourColGrid
             header={searchTerm ? "Search Result" : "Popular Movies"}
@@ -168,12 +186,10 @@ class Home extends Component {
             })}
           </FourColGrid>
           {loading ? <Spinner></Spinner> : null}
-          {currentPage <= totalPages && !this.loading ? (
-            <LoadMoreBtn text="Load More" onClick={this.loadMoreItems} />
+          {currentPage < totalPages && !this.loading ? (
+            <LoadMoreBtn text="Load More" onClick={this.updateItems} />
           ) : null}
         </div>
-
-        <LoadMoreBtn />
       </div>
     );
   }
