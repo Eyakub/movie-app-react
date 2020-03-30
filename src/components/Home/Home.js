@@ -27,9 +27,9 @@ class Home extends Component {
 
   componentDidMount() {
     // checking if local storage contain state value or not
-    if (localStorage.getItem('HomeState')) {
-      const state = JSON.parse(localStorage.getItem('HomeState'));
-      this.setState( { ...state });
+    if (localStorage.getItem("HomeState")) {
+      const state = JSON.parse(localStorage.getItem("HomeState"));
+      this.setState({ ...state });
     } else {
       this.setState({ loading: true });
       const endpoint = `${API_URL}movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
@@ -65,67 +65,114 @@ class Home extends Component {
     } else {
       endpoint = `${API_URL}search/movie?api_key=${API_KEY}&language=en-US&query=${
         this.state.searchTerm
-      }&page=${this.state.currentPage + 1}`;
+        }&page=${this.state.currentPage + 1}`;
     }
     this.fetchitems(endpoint);
   };
 
-  fetchitems = endpoint => {
-    fetch(endpoint)
-      .then(result => result.json())
-      .then(result => {
-        this.setState({
+  fetchitems = async endpoint => {
+    const { movies, heroImage, searchItem } = this.state;
+    const result = await (await fetch(endpoint)).json();
+    try{
+      this.setState(
+        {
           movies: [...this.state.movies, ...result.results],
           heroImage: this.state.heroImage || result.results[0],
           loading: false,
           currentPage: result.page,
           totalPages: result.total_pages
-        }, () => {
+        },
+        () => {
           // doing this for setting STATE on local storage
           // check from chrome console > application
-          if (this.state.searchTerm === ''){
+          if (this.state.searchTerm === "") {
             // if we don't want to store search result
-            localStorage.setItem('HomeState', JSON.stringify(this.state));
+            localStorage.setItem("HomeState", JSON.stringify(this.state));
           }
-        });
-      })
-      .catch(error => console.error("error:", error));
+        }
+      );
+    }
+    catch (e){
+      console.log("There was an error: ", e);
+    }
   };
 
+  // fetchitems = endpoint => {
+  //   fetch(endpoint)
+  //     .then(result => result.json())
+  //     .then(result => {
+  //       this.setState(
+  //         {
+  //           movies: [...this.state.movies, ...result.results],
+  //           heroImage: this.state.heroImage || result.results[0],
+  //           loading: false,
+  //           currentPage: result.page,
+  //           totalPages: result.total_pages
+  //         },
+  //         () => {
+  //           // doing this for setting STATE on local storage
+  //           // check from chrome console > application
+  //           if (this.state.searchTerm === "") {
+  //             // if we don't want to store search result
+  //             localStorage.setItem("HomeState", JSON.stringify(this.state));
+  //           }
+  //         }
+  //       );
+  //     })
+  //     .catch(error => console.error("error:", error));
+  // };
+
   render() {
+    // ES6 destructuring the state
+    const {
+      movies,
+      heroImage,
+      loading,
+      currentPage,
+      totalPages,
+      searchTerm
+    } = this.state;
+    // const { prop1, prop2 } = this.props;
     return (
       <div className="rmdb-home">
         {/* using turnary operator */}
-        {this.state.heroImage ? (
+        {heroImage ? (
           <div>
             <HeroImage
-              image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}/${this.state.heroImage.backdrop_path}`}
-              title={this.state.heroImage.original_title}
-              text={this.state.heroImage.overview}
+              image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}/${heroImage.backdrop_path}`}
+              title={heroImage.original_title}
+              text={heroImage.overview}
             />
             <SearchBar callback={this.searchItems} />
           </div>
         ) : null}
         <div className="rmdb-home-grid">
-          <FourColGrid header={ this.state.searchTerm ? 'Search Result' : 'Popular Movies' }
-          loading={ this.state.loading }
+          <FourColGrid
+            header={searchTerm ? "Search Result" : "Popular Movies"}
+            loading={loading}
           >
-            {this.state.movies.map((element, i) => {
-              return <MovieThumb
-                        key={i}
-                        clickable={true}
-                        image={element.poster_path ? `${IMAGE_BASE_URL}${POSTER_SIZE}/${element.poster_path}` : '../../../public/images/no_image.jpg' }
-                        movieId={element.id}
-                        movieName={element.original_title}
-                      />
+            {movies.map((element, i) => {
+              return (
+                <MovieThumb
+                  key={i}
+                  clickable={true}
+                  image={
+                    element.poster_path
+                      ? `${IMAGE_BASE_URL}${POSTER_SIZE}/${element.poster_path}`
+                      : "../../../public/images/no_image.jpg"
+                  }
+                  movieId={element.id}
+                  movieName={element.original_title}
+                />
+              );
             })}
           </FourColGrid>
-          { this.state.loading ? <Spinner></Spinner> : null }
-          {(this.state.currentPage <= this.state.totalPages && !this.loading) ? 
-              <LoadMoreBtn text="Load More" onClick={this.loadMoreItems} /> 
-              : null } 
+          {loading ? <Spinner></Spinner> : null}
+          {currentPage <= totalPages && !this.loading ? (
+            <LoadMoreBtn text="Load More" onClick={this.loadMoreItems} />
+          ) : null}
         </div>
-        
+
         <LoadMoreBtn />
       </div>
     );

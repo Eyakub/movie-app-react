@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 const App = () => {
   return (
-    <BrowserRouter basename="react_rmdb">
+    <BrowserRouter basename="movie-app-react">
         <React.Fragment>
             <Header></Header>
             <Switch>
